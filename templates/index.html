@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>抽卡遊戲</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .card-name {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .card-rarity {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .card-container {
+      width: 350px;
+      height: 500px;
+      perspective: 1000px; /* 讓 3D 翻轉有深度 */
+      margin: 20px auto;    /* 上下留空，左右置中 */
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d; /* 保留 3D 效果 */
+      transition: transform 1s;
+    }
+
+    .card.flip {
+      transform: rotateY(180deg); /* 卡片翻轉 */
+      animation: glow-flip 1s ease; /* ✨ 翻轉時發光動畫 */
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border: 2px solid #333;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* 基本陰影 */
+    }
+
+    .front {
+      background: url('/static/images/card-back.png') no-repeat center center;
+      background-size: cover; /* 卡背圖填滿 */
+    }
+
+    .back {
+      background: white;
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .greeting {
+      font-size: 24px;      /* 文字大小 */
+      font-weight: bold;    /* 粗體 */
+      margin-bottom: 10px;
+    }
+    .back img {
+      width: 300px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 25px gold; /* 卡片圖像加金光陰影 ✨ */
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .logout-link {
+      font-size: 18px;       /* 文字大小 */
+      color: purple;
+      text-decoration: underline;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    /* 翻轉動畫效果（黃金閃光） */
+    @keyframes glow-flip {
+      0% {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.5);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0);
+      }
+    }
+    #draw-card {
+    padding: 15px 30px;    /* 上下 15px、左右 30px */
+    font-size: 20px;       /* 文字大小 */
+    border-radius: 8px;
+    cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  {% if user %}
+    <p class="greeting">是時候抽卡了!，{{ user.username }}！</p>
+    <a href="/logout" class="logout-link">登出</a><br><br>
+    <button id="draw-card">抽卡！</button>
+
+    <div class="card-container">
+      <div class="card" id="card">
+        <div class="card-face front"></div>
+        <div class="card-face back" id="card-back"></div>
+      </div>
+    </div>
+  {% else %}
+    <a href="/login">使用 Discord 登入</a>
+  {% endif %}
+
+  <script>
+    const drawBtn = document.getElementById("draw-card");
+    const card = document.getElementById("card");
+    const back = document.getElementById("card-back");
+
+    drawBtn?.addEventListener("click", async () => {
+      // 清除翻轉狀態與內容
+      card.classList.remove("flip");
+      back.innerHTML = "";
+
+      // 等待一點點再翻轉
+      setTimeout(async () => {
+        const res = await fetch("/api/draw-card");
+        const data = await res.json();
+
+        back.innerHTML = `
+          <img src="${data.image}" />
+          <h3>${data.name}</h3>
+          <p>${data.rarity}</p>
+        `;
+
+        card.classList.add("flip"); // 加上 flip class 觸發動畫
+      }, 300);
+    });
+  </script>
+</body>
+</html>

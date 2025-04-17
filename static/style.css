@@ -1,0 +1,4 @@
+.front {
+    background: url('/static/images/card-back.png') no-repeat center center;
+    background-size: cover;
+  }
