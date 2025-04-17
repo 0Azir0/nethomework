@@ -13,7 +13,7 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
-# 登入 - 跳轉 Discord 授權
+# 登入 - 跳轉 Discord 授權(謝謝GPT)
 @app.route("/login")
 def login():
     return redirect(f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&response_type=code&scope=identify")
@@ -24,7 +24,7 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
-# Discord 回傳 callback
+# Discord 回傳 
 @app.route("/callback")
 def callback():
     code = request.args.get("code")
@@ -49,17 +49,17 @@ def callback():
     session['user'] = user
     return redirect(url_for("index"))
 
-# 首頁
+
 @app.route("/")
 def index():
     return render_template("index.html", user=session.get("user"))
 
-# 抽卡 API
+#抽卡API在此!
 @app.route("/api/draw-card")
 def draw_card():
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-
+#小明建模
     cards = [
         {"name": "我老爸得了", "rarity": "MVP", "image": "https://geng.9letu.com/wp-content/uploads/2025/03/1741056319-2025030107.png"},
         {"name": "回答我", "rarity": "!!!", "image": "https://i.ytimg.com/vi/iCzse-Wutmg/maxresdefault.jpg"},
