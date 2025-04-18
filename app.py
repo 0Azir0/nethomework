@@ -28,6 +28,8 @@ def logout():
 @app.route("/callback")
 def callback():
     code = request.args.get("code")
+    if not code:
+        return "Missing code in request", 400
     data = {
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
@@ -37,6 +39,10 @@ def callback():
         'scope': 'identify'
     }
     headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+    res = requests.post("https://discord.com/api/oauth2/token", data=data, headers=headers)
+
+    if res.status_code != 200:
+        return f"Failed to exchange code. Status: {res.status_code}, Error: {res.text}", 400
 
     r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
     access_token = r.json().get("access_token")
