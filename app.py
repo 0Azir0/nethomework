@@ -11,7 +11,7 @@ app.secret_key = os.urandom(24)
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
+REDIRECT_URI =os.getenv("REDIRECT_URI")
 
 # 登入 - 跳轉 Discord 授權(謝謝GPT)
 @app.route("/login")
@@ -44,9 +44,7 @@ def callback():
     if res.status_code != 200:
         return f"Failed to exchange code. Status: {res.status_code}, Error: {res.text}", 400
 
-    r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
-    access_token = r.json().get("access_token")
-
+    access_token = res.json().get("access_token")
     user_res = requests.get('https://discord.com/api/users/@me', headers={
         'Authorization': f'Bearer {access_token}'
     })
